@@ -1,0 +1,12 @@
+{
+  "_template": "gh:cjolowicz/cookiecutter-hypermodern-python",
+  "author": "RSIP Vision",
+  "development_status": "Development Status :: 4 - Beta",
+  "email": "info@rsipvision.com",
+  "friendly_name": "Medio",
+  "github_user": "RSIP-Vision",
+  "license": "Apache-2.0",
+  "package_name": "medio",
+  "project_name": "medio",
+  "version": "0.4.1"
+}
