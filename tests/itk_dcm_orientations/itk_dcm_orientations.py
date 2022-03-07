@@ -2,7 +2,7 @@ import os
 
 import itk
 import numpy as np
-import pandas as pd
+import pandas as pd  # type: ignore
 
 from tests.itk_dcm_orientations.orientations_utils import (
     ornt_list,
