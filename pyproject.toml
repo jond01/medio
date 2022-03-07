@@ -50,6 +50,7 @@ mypy = "^0.931"
 
 [tool.mypy]
 show_error_codes = true
+disallow_untyped_defs = true
 
 [[tool.mypy.overrides]]
 module = [
