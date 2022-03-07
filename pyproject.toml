@@ -49,7 +49,7 @@ mypy = "^0.931"
 "Bug Tracker" = "https://github.com/RSIP-Vision/medio/issues"
 
 [tool.mypy]
-
+show_error_codes = true
 
 [[tool.mypy.overrides]]
 module = [
