@@ -1,8 +1,12 @@
 import pprint
+from os import PathLike
 from pathlib import Path
+from typing import Tuple, Iterable, Union
 
 
-def is_file_suffix(filename, suffixes, check_exist=True):
+def is_file_suffix(
+    filename: PathLike, suffixes: Tuple[str, ...], check_exist: bool = True
+) -> bool:
     """
     is_file + check for suffix
     :param filename: pathlike object
@@ -15,7 +19,7 @@ def is_file_suffix(filename, suffixes, check_exist=True):
     return str(filename).endswith(suffixes)
 
 
-def is_nifti(filename, check_exist=True):
+def is_nifti(filename: PathLike, check_exist: bool = True) -> bool:
     return is_file_suffix(
         filename,
         (".nii.gz", ".nii", ".img.gz", ".img", ".hdr"),
@@ -23,13 +27,13 @@ def is_nifti(filename, check_exist=True):
     )
 
 
-def is_dicom(filename, check_exist=True):
+def is_dicom(filename: PathLike, check_exist: bool = True) -> bool:
     return is_file_suffix(
         filename, (".dcm", ".dicom", ".DCM", ".DICOM"), check_exist=check_exist
     )
 
 
-def make_empty_dir(dir_path, parents=False):
+def make_empty_dir(dir_path: PathLike, parents: bool = False) -> None:
     """Make an empty directory. If it exists - check that it is empty"""
     dir_path = Path(dir_path)
     try:
@@ -44,14 +48,19 @@ def make_empty_dir(dir_path, parents=False):
             raise FileExistsError(f'The directory "{dir_path}" is not empty')
 
 
-def make_dir(dir_path, parents=False, exist_ok=False):
+def make_dir(dir_path: PathLike, parents: bool = False, exist_ok: bool = False) -> None:
     if exist_ok:
         Path(dir_path).mkdir(parents=parents, exist_ok=exist_ok)
     else:
         make_empty_dir(dir_path, parents)
 
 
-def parse_series_uids(input_dir, series_uids, series=None, globber=None):
+def parse_series_uids(
+    input_dir: PathLike,
+    series_uids: Iterable[str],
+    series: Union[str, int, None] = None,
+    globber: Union[str, None] = None,
+) -> str:
     """Receive an input dir, an iterable of series UIDs, and a series (UID string or int),
     return a series uid according to series_uids and series"""
     keys = sorted(series_uids)
@@ -87,3 +96,6 @@ def parse_series_uids(input_dir, series_uids, series=None, globber=None):
                     f"\n{pprint.pformat(keys)}"
                 )
             return series
+
+    # Added for mypy, should never reach this point - all the cases are covered before
+    raise AssertionError
