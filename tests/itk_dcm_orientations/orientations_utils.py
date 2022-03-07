@@ -17,7 +17,7 @@ def ornt2direction(ornt):
 
 
 ornt_iter = itertools.chain(
-    *map(itertools.permutations, itertools.product(("R", "L"), ("A", "P"), ("I", "S")))
+    *map(itertools.permutations, itertools.product(("R", "L"), ("A", "P"), ("I", "S")))  # type: ignore[arg-type]
 )
 
 # dictionary that translates itk orientation codes to direction matrices
@@ -25,7 +25,7 @@ ornt_direction_dict = dict()
 ornt_list = []
 
 for ornt_tup in ornt_iter:
-    ornt = "".join(ornt_tup)
+    ornt = "".join(ornt_tup)  # type: ignore[arg-type]
     ornt_list += [ornt]
     ornt_direction_dict[ornt] = ornt2direction(ornt)
 
