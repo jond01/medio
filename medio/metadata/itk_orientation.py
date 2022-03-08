@@ -4,7 +4,7 @@ This module is based on the C++ ITK code - itkSpatialOrientation.h
 
 import itertools
 from enum import IntEnum
-from typing import Iterable, Tuple
+from typing import Iterable, Tuple, Union
 
 from medio.utils.two_way_dict import TwoWayDict
 
@@ -48,7 +48,7 @@ _ax_codes_iter = itertools.chain(*_perms)
 
 # two-way dictionary that translates itk numerical orientation codes to orientation
 # strings and vice versa
-codes_str_dict = TwoWayDict()
+codes_str_dict: TwoWayDict[Union[str, int, None]] = TwoWayDict()
 codes_str_dict[None] = None
 
 for ax_code in _ax_codes_iter:
