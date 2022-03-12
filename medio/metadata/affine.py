@@ -5,7 +5,7 @@ from numpy.typing import NDArray, ArrayLike
 
 _IndexType = Union[int, slice, ellipsis]
 _ItemType2D = Tuple[_IndexType, _IndexType]
-NDArrayFloat = NDArray[np.float_]
+NDArrayFloat = NDArray[np.float64]
 
 
 class Affine(NDArrayFloat):
