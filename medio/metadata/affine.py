@@ -1,11 +1,27 @@
-from typing import Optional, Tuple, Union, TYPE_CHECKING, NewType, TypeVar, Any
+from typing import Optional, Tuple, Union, Any, TYPE_CHECKING
 
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
 
-_IndexType = Union[int, slice, ellipsis]
+if TYPE_CHECKING:
+    import sys
+    if sys.version_info.major < 3:
+        raise ValueError("Python 2 is not supported by `medio`.")
+
+    if sys.version_info.minor < 10:
+        # See:
+        # https://mypy.readthedocs.io/en/stable/common_issues.html#variables-vs-type-aliases
+        from typing_extensions import TypeAlias
+    else:
+        from typing import TypeAlias  # type:ignore[attr-defined,no-redef]
+
+    NDArrayFloat: TypeAlias = NDArray[np.float64]
+else:
+    NDArrayFloat = Any
+
+
+_IndexType = Union[int, slice, Any]  # Any is for Ellipsis
 _ItemType2D = Tuple[_IndexType, _IndexType]
-NDArrayFloat = NewType("NDArrayFloat", NDArray[np.float64])  # type:ignore[valid-newtype]
 
 
 class Affine(NDArray[np.float64]):
@@ -81,7 +97,7 @@ class Affine(NDArray[np.float64]):
     # Affine properties in addition to the numpy array
     @property
     def origin(self) -> NDArrayFloat:
-        return NDArrayFloat(self[self._origin_key])
+        return self[self._origin_key]
 
     @origin.setter
     def origin(self, value: ArrayLike) -> None:
@@ -130,7 +146,7 @@ class Affine(NDArray[np.float64]):
         return affine
 
     @staticmethod
-    def affine2origin(affine: NDArrayFloat) -> ArrayLike:
+    def affine2origin(affine: NDArrayFloat) -> NDArrayFloat:
         return affine[Affine._origin_key]
 
     @staticmethod
