@@ -1,31 +1,14 @@
-from typing import Optional, Tuple, Union, TYPE_CHECKING
+from typing import Optional, Tuple, Union, TYPE_CHECKING, NewType, TypeVar, Any
 
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
 
 _IndexType = Union[int, slice, ellipsis]
 _ItemType2D = Tuple[_IndexType, _IndexType]
-NDArrayFloat = NDArray[np.float64]
-
-# if TYPE_CHECKING:
-#     import sys
-#
-#     if sys.version_info.major < 3:
-#         raise ValueError("Python 2 is not supported.")
-#
-#     if sys.version_info.minor < 8:
-#         NDArrayFloat = NDArray[float]
-#     else:
-#         NDArrayFloat = NDArray[np.float_]
-# else:
-#     NDArrayFloat = np.ndarray
-
-NDArrayFloat = NDArray[float]
-_IndexType = Union[int, slice, ellipsis]
-_ItemType2D = Tuple[_IndexType, _IndexType]
+NDArrayFloat = NewType("NDArrayFloat", NDArray[np.float64])  # type:ignore[valid-newtype]
 
 
-class Affine(NDArray[float]):
+class Affine(NDArray[np.float64]):
     """
     Class for general (d+1)x(d+1) affine matrices, and in particular d=3 (3d space)
     Usage examples:
@@ -98,7 +81,7 @@ class Affine(NDArray[float]):
     # Affine properties in addition to the numpy array
     @property
     def origin(self) -> NDArrayFloat:
-        return self[self._origin_key]
+        return NDArrayFloat(self[self._origin_key])
 
     @origin.setter
     def origin(self, value: ArrayLike) -> None:
