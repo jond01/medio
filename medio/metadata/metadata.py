@@ -1,3 +1,4 @@
+from typing import Optional, Union
 import pprint
 from copy import deepcopy
 
@@ -9,7 +10,13 @@ from medio.metadata.convert_nib_itk import convert_nib_itk, inv_axcodes, convert
 
 
 class MetaData:
-    def __init__(self, affine, orig_ornt=None, coord_sys="itk", header=None):
+    def __init__(
+        self,
+        affine: Union[Affine, np.ndarray],
+        orig_ornt: Optional[str] = None,
+        coord_sys: str = "itk",
+        header: Optional[dict] = None,
+    ):
         """
         Initialize medical image's metadata
         :param affine: affine matrix of class Affine, numpy float array of shape (4, 4)
@@ -22,17 +29,17 @@ class MetaData:
             affine = Affine(affine)
         self.affine = affine
         self.orig_ornt = orig_ornt
-        self._ornt = None
+        self._ornt: Optional[str] = None
         self.check_valid_coord_sys(coord_sys)
         self.coord_sys = coord_sys
         self.header = header
 
     @staticmethod
-    def check_valid_coord_sys(coord_sys):
+    def check_valid_coord_sys(coord_sys: str) -> None:
         if coord_sys not in ("itk", "nib"):
             raise ValueError('Metadata coord_sys must be "itk" or "nib"')
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         sep = " " if self.header is None else "\n"
         return (
             f"Affine:\n"
@@ -45,19 +52,19 @@ class MetaData:
             f"{pprint.pformat(self.header, indent=4)}"
         )
 
-    def convert(self, dest_coord_sys):
+    def convert(self, dest_coord_sys: str) -> None:
         """
         Converts the metadata coordinate system in-place to dest_coord_sys. Affects affine, ornt and orig_ornt
         :param dest_coord_sys: the destination coordinate system - 'itk' or 'nib' (nifti)
         """
         self.check_valid_coord_sys(dest_coord_sys)
         if dest_coord_sys != self.coord_sys:
-            self.affine, self._ornt, self.orig_ornt = convert_nib_itk(
-                self.affine, self._ornt, self.orig_ornt
+            self.affine, [self._ornt, self.orig_ornt] = convert_nib_itk(
+                self.affine, [self._ornt, self.orig_ornt]
             )
             self.coord_sys = dest_coord_sys
 
-    def clone(self):
+    def clone(self) -> "MetaData":
         return MetaData(
             affine=self.affine.clone(),
             orig_ornt=self.orig_ornt,
@@ -65,7 +72,7 @@ class MetaData:
             header=deepcopy(self.header),
         )
 
-    def get_ornt(self):
+    def get_ornt(self) -> str:
         """Returns current orientation based on the affine and coordinate system"""
         if self.coord_sys == "nib":
             ornt_tup = aff2axcodes(self.affine)
@@ -77,7 +84,7 @@ class MetaData:
         return ornt_str
 
     @property
-    def ornt(self):
+    def ornt(self) -> str:
         if self._ornt is None:
             self._ornt = self.get_ornt()
             # if self.orig_ornt is also None, the affine was not reoriented and the original orientation is the same
@@ -86,10 +93,10 @@ class MetaData:
         return self._ornt
 
     @property
-    def spacing(self):
+    def spacing(self) -> np.ndarray:
         return self.affine.spacing
 
-    def is_right_handed_ornt(self):
+    def is_right_handed_ornt(self) -> bool:
         """Check whether the affine orientation is right or left handed. The sign of the triple product of the
         direction matrix is calculated with a determinant. It should be +1 or -1 because it is a rotation matrix.
         +1 (-1) indicates right (left) handed orientation.
@@ -99,7 +106,7 @@ class MetaData:
         return np.linalg.det(self.affine.direction) > 0
 
 
-def is_right_handed_axcodes(axcodes):
+def is_right_handed_axcodes(axcodes: str) -> bool:
     if len(axcodes) == 2:
         return True
     if len(axcodes) != 3:
@@ -119,11 +126,15 @@ def is_right_handed_axcodes(axcodes):
     return ornt_sign == 1
 
 
-def flip_last_axcodes(axcodes):
+def flip_last_axcodes(axcodes: str) -> str:
     return axcodes[:-1] + inv_axcodes(axcodes[-1])
 
 
-def check_dcm_ornt(desired_ornt, metadata, allow_dcm_reorient=False):
+def check_dcm_ornt(
+    desired_ornt: Optional[str],
+    metadata: MetaData,
+    allow_dcm_reorient: bool = False,
+) -> str:
     """Check whether the orientation desired_ornt is right handed before saving image as a dicom
     :param desired_ornt: the desired orientation for the saver
     :param metadata: if desired_ornt is None (not set), use metadata.ornt
